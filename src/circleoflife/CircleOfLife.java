@@ -6,8 +6,6 @@
 package circleoflife;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Scanner;
 
 
@@ -24,7 +22,7 @@ public class CircleOfLife {
         // TODO code application logic here
         Scanner sc=new Scanner(System.in);
         int n=sc.nextInt();
-        int t=sc.nextInt();
+        long t=sc.nextLong();
         sc.nextLine();
         BigInteger circle = sc.nextBigInteger(2);
         
@@ -36,32 +34,28 @@ public class CircleOfLife {
 
     
 
-    private static BigInteger getGeneration(int n, int t, BigInteger circle) {
-
-        HashMap<BigInteger,Integer> map=new HashMap();
-        HashMap<Integer,BigInteger> reverseMap=new HashMap();
-
-        BigInteger next=circle;
-        for (int i=1;i<=t;i++) {
-            next=getNextGeneration(n,next);
-            if (map.containsKey(next)) {
-                int cycleStart=map.get(next);
-                int cycle=i-cycleStart;
-                int left=(t+1-cycleStart)%cycle;
-                return reverseMap.get((left+cycle-1)%cycle);
-            } else {
-                map.put(next, i);
-                reverseMap.put(i, next);
-            }
+    private static BigInteger getGeneration(int n, long t, BigInteger circle) {
+        if (t==0) {
+            return circle;
+        } 
+        int twoPower=calculateTwoPower(t);
+        long shift;
+        if (twoPower==0) {
+            shift=t;
+            t=0;
+        } else {
+            shift=1L<<twoPower;
+            t-=shift;
         }
-        return next;
+        
+        BigInteger left=rotateLeft(n,circle,(int)(shift%(long)n));
+        BigInteger right=rotateRight(n,circle,(int)(shift%(long)n));
+        
+        BigInteger newCircle=left.xor(right);
+        
+        return getGeneration(n,t,newCircle);
     }
 
-    private static BigInteger getNextGeneration(int n, BigInteger circle) {
-        BigInteger bigInt1=rotateLeft(n,circle);
-        BigInteger bigInt2=rotateRight(n,circle);
-        return bigInt1.xor(bigInt2);
-    }
 
 
     private static void printBinary(int n, BigInteger circle) {
@@ -70,16 +64,28 @@ public class CircleOfLife {
         }
     }
 
-    private static BigInteger rotateLeft(int n, BigInteger circle) {
-        BigInteger mask=BigInteger.ONE.shiftLeft(n).subtract(BigInteger.ONE);
-        BigInteger topBit=circle.testBit(n-1)?BigInteger.ONE:BigInteger.ZERO;
-        return circle.shiftLeft(1).add(topBit).and(mask);
+    private static BigInteger rotateLeft(int n, BigInteger circle,int rotate) {
+        BigInteger mask=BigInteger.ONE.shiftLeft(rotate).subtract(BigInteger.ONE);
+        BigInteger right=circle.shiftRight(n-rotate).and(mask);
+        mask=BigInteger.ONE.shiftLeft(n-rotate).subtract(BigInteger.ONE).shiftLeft(rotate);
+        BigInteger left=circle.shiftLeft(rotate).and(mask);
+        
+        return left.or(right);
     }
     
-    private static BigInteger rotateRight(int n, BigInteger circle) {
-        BigInteger mask=BigInteger.ONE.shiftLeft(n).subtract(BigInteger.ONE);
-        BigInteger bottomBit=circle.testBit(0)?BigInteger.ONE:BigInteger.ZERO;
-        return circle.shiftRight(1).add(bottomBit.shiftLeft(n-1)).and(mask);
+    private static BigInteger rotateRight(int n, BigInteger circle,int rotate) {
+        return rotateLeft(n,circle,n-rotate);
+    }
+
+    private static int calculateTwoPower(long t) {
+        if (t<2) return 0;
+        int count=0;
+        long twoPower=1;
+        while (twoPower<t) {
+            twoPower<<=1;
+            count++;
+        }
+        return count-1;
     }
 }
 
