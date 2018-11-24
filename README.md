@@ -4,4 +4,11 @@ Problem URL:
 
   https://dmoj.ca/problem/ccc16s5
   
-Test Status: fully passed
+Branches:
+  master: Using a trick to memorize the cycle.
+  calculate: calculate the cycle by maths.
+  
+Test Status: 
+  master partially passed with performance timeout.
+  brach calculate fully passed
+
