@@ -14,5 +14,5 @@ Test Status:
 
   master partially passed with performance timeout.
   
-  brach calculate fully passed
+  calculate fully passed
 
