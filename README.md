@@ -12,7 +12,10 @@ Branches:
   
 Test Status: 
 
-  master partially passed with performance timeout.
+  master partially passed with performance timeout. Java
   
-  calculate fully passed
+  calculate fully passed. Java
+  
+IDE:
+  NetBeans Project
 
